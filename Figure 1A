@@ -1,0 +1,38 @@
+# Checking and setting the folder containing the datasets
+getwd()
+setwd("D:/Publication MDM/In progress/GP_2025/Figures and Manuscript/Code")
+
+# Loading the required packages/libraries
+library(ggplot2)
+library(ggmap)
+library(sf)
+library(ggplot2)
+library(patchwork)
+library(readxl)
+library(viridis)
+
+# Importing all valid UK postcodes
+worldmap = map_data('world')
+uk_postc <- read_excel("D:/University of Worcester/Research/My Research/Hematology/Census 2011/cleaned_UKpostcodes_coordinates.xlsx")
+uk_postc <- subset(uk_postc, select = -c(postcode))
+
+# Setting the visualisation grid, using min/max geographical coordinates
+min_lat = min(uk_postc$latitude)
+max_lat = max(uk_postc$latitude)
+min_long = min(uk_postc$longitude)
+max_long = max(uk_postc$longitude)
+
+# Create Figure 1A
+# May take several minutes to compute (CPU intensive)
+ggplot() + 
+  geom_polygon(data = worldmap, 
+               aes(x = long, y = lat, 
+                   group = group), 
+               fill = 'white', 
+               color = 'black') + 
+  coord_fixed(ratio = 1.3, 
+              xlim = c(min_long,max_long), 
+              ylim = c(min_lat,max_lat)) + theme_void() +
+  geom_point(data = uk_postc, 
+             aes(x = longitude, 
+                 y = latitude), color="darkblue", cex=0.3, alpha=0.6)

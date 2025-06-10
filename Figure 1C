@@ -1,0 +1,52 @@
+# Checking and setting the folder containing the datasets
+getwd()
+setwd("D:/Publication MDM/In progress/GP_2025/Figures and Manuscript/Code")
+
+# Loading the required packages/libraries
+library(ggplot2)
+library(ggmap)
+library(sf)
+library(ggplot2)
+library(patchwork)
+library(readxl)
+library(viridis)
+
+# Importing the 2 required datasets
+# Importing the first dataset (all valid UK postcodes)
+uk_postc <- read_excel("D:/University of Worcester/Research/My Research/Hematology/Census 2011/cleaned_UKpostcodes_coordinates.xlsx")
+uk_postc_sf <- st_as_sf(x = uk_postc,                         
+                        coords = c("longitude", "latitude"))
+# Importing the second dataset (all GP practice postcodes in the UK)
+gp_postc <- read_excel("D:/University of Worcester/Research/My Research/Hematology/Census 2011/E_S_NI_W_GPcoord.xlsx")
+gp_postc_2 <- subset(gp_postc, select = -c(postcode))
+gp_postc_sf <- st_as_sf(x = gp_postc,                         
+                        coords = c("longitude", "latitude"))
+
+# Computing the distance between each household postcode and nearest GP practice postcode
+# These steps are GPu intensive and may take several minutes to compute
+nearest_place <- st_nearest_feature(uk_postc_sf, gp_postc_sf)
+nearest_distance <- st_distance(uk_postc_sf, gp_postc_sf[nearest_place,], by_element=TRUE)
+
+# Matching each household postcode with the data on distance to nearest GP practice
+agg_data <- cbind(uk_postc, nearest_distance)
+sites2 <- data.frame(longitude=agg_data$longitude, latitude=agg_data$latitude, coul=agg_data$nearest_distance)
+map <- st_as_sf(sites2, coords = c("longitude", "latitude"), crs = 4326)
+
+# Create Figure 1C
+# High CPU demands, may take several minutes to compute
+plot(map,pch=20,cex=0.1,key.pos=1)
+
+# Descriptive statistics
+# High CPU demands for the following tasks, may take several minutes to compute
+library(dplyr)
+s_distance = agg_data %>% select(nearest_distance)
+summary(s_distance)
+s_distance_low = subset(s_distance, nearest_distance <0.005)
+s_distance_med = subset(s_distance, nearest_distance >=0.005 & nearest_distance <0.02)
+s_distance_high = subset(s_distance, nearest_distance >=0.02)
+s_distance_veryhigh = subset(s_distance, nearest_distance >=0.2)
+s_distance_extreme = subset(s_distance, nearest_distance >=0.5)
+s_distance_within_10km = subset(s_distance, nearest_distance <=0.1)
+s_distance_over_15km = subset(s_distance, nearest_distance >=0.15)
+agg_data[which.max(agg_data$nearest_distance), c("postcode")]
+View(agg_data)

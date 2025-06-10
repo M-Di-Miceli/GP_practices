@@ -9,4 +9,4 @@ These datasets have been uploaded to allow replication of the results presented.
 -Datasets: https://github.com/M-Di-Miceli/GP_practices/tree/Datasets
 -Codes:  https://github.com/M-Di-Miceli/GP_practices/tree/Code/Code
 -Licence details: https://github.com/M-Di-Miceli/GP_practices/blob/Code/LICENSE
--Readme.md text (current text displaying): https://github.com/M-Di-Miceli/GP_practices/blob/Code/README.md
+-Readme.md text (current text displaying): https://github.com/M-Di-Miceli/GP_practices/blob/main/README.md

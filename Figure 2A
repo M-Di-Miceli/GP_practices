@@ -1,0 +1,26 @@
+# Checking and setting the folder containing the datasets
+getwd()
+setwd("D:/Publication MDM/In progress/GP_2025/Figures and Manuscript/Code")
+
+# Loading the required packages/libraries
+library(readxl)
+library(ggplot2)
+
+# Loading the corresponding dataset
+data_graphs <- read_excel("Violins_GP_data_1.xlsx")
+
+# Storing data into three different objects in preparation for graphs
+graph_1 <- ggplot(data_graphs, aes(x = "", y = Tot_patients)) + 
+  geom_violin(trim=T,fill="gray") + 
+  geom_boxplot(width=0.05, outlier.shape = NA)
+graph_2 <- ggplot(data_graphs, aes(x = "", y = Nb_GPSurgeries)) + 
+  geom_violin(trim=T,fill="gray") + 
+  geom_boxplot(width=0.05, outlier.shape = NA)
+graph_3 <- ggplot(data_graphs, aes(x = "", y = Patient_per_surg)) + 
+  geom_violin(trim=T,fill="gray") + 
+  geom_boxplot(width=0.05, outlier.shape = NA)
+
+# Create Figure 2A using the patchwork graphing library
+library(patchwork)
+graph_1 + graph_2 + graph_3
+

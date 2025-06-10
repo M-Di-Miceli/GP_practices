@@ -1,0 +1,51 @@
+# Checking and setting the folder containing the datasets
+getwd()
+setwd("D:/Publication MDM/In progress/GP_2025/Figures and Manuscript/Code")
+
+# Loading the required packages/libraries
+library(xlsx)
+library(rgeos)
+library(maps)
+library(maptools)
+library(rgdal)
+library(terra)
+library(dplyr)
+library("tidyverse")
+library("rstatix")
+library(viridis)
+library(ggplot2)
+library("ggpubr")
+library(broom)
+library(patchwork)
+
+# Importing the dataset on patients in GP practices per LAD
+data_GP <- read.xlsx("Violins_GP_data_1.xlsx", sheetIndex = 1)
+
+# Importing the more complex dataset on patients in GP practices per LAD
+data_density <- read.xlsx("Violins_GP_data_2.xlsx", sheetIndex = 1)
+data_density_exCoL <- data_density %>% filter(!row_number() %in% c(62))
+
+# Loading the required shaper files in preparation of mapping
+# Here, the folder containing the below file also needs to contain the different associated files extensions (cpg, dbf, prj and shx)
+# Ignore the warning messages
+shp <- readOGR("LAD_APR_2019_UK_BUC.shp") 
+
+# Arranging the data
+shp <- tidy(shp, region = 'LAD19CD')
+
+# Merging the data on patients with the LAD geographic characteristics
+shp2 <- merge(data_GP, shp, by.x = 'LAD11CD', by.y = 'id', all.x = T, all.y=F)
+
+# Arranging the data
+shp2 <- arrange(shp2, order)
+
+# Converting the data according to data in preparation of mapping
+shp2 <- merge(data_density_exCoL, shp, by.x = 'LAD11CD', by.y = 'id', all.x = T, all.y=F)
+shp2 <- arrange(shp2, order)
+
+# Create Figure 2B
+plot5 <- ggplot(data = shp2, aes(x = long, y = lat, group = group, fill = pat_per_hect_per_surg)) +
+  geom_polygon() + coord_equal() + theme_void() +
+  ggtitle('Patient per GP practice per LAD',
+          subtitle = 'in hectare')
+plot5 + scale_fill_viridis() 

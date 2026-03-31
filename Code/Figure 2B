@@ -1,6 +1,6 @@
 # Checking and setting the folder containing the datasets
 getwd()
-setwd("D:/Publication MDM/In progress/GP_2025/Figures and Manuscript/Code")
+setwd("XXXXX")
 
 # Loading the required packages/libraries
 library(xlsx)
@@ -19,10 +19,10 @@ library(broom)
 library(patchwork)
 
 # Importing the dataset on patients in GP practices per LAD
-data_GP <- read.xlsx("Violins_GP_data_1.xlsx", sheetIndex = 1)
+data_GP <- read.xlsx("New_dataPop.xlsx", sheetIndex = 1)
 
 # Importing the more complex dataset on patients in GP practices per LAD
-data_density <- read.xlsx("Violins_GP_data_2.xlsx", sheetIndex = 1)
+data_density <- read.xlsx("New_dataPop.xlsx", sheetIndex = 1)
 data_density_exCoL <- data_density %>% filter(!row_number() %in% c(62))
 
 # Loading the required shaper files in preparation of mapping
@@ -43,9 +43,25 @@ shp2 <- arrange(shp2, order)
 shp2 <- merge(data_density_exCoL, shp, by.x = 'LAD11CD', by.y = 'id', all.x = T, all.y=F)
 shp2 <- arrange(shp2, order)
 
-# Create Figure 2B
-plot5 <- ggplot(data = shp2, aes(x = long, y = lat, group = group, fill = pat_per_hect_per_surg)) +
+# Create Figure 2B-1
+plot1 <- ggplot(data = shp2, aes(x = long, y = lat, group = group, fill = Pop_Density)) +
   geom_polygon() + coord_equal() + theme_void() +
-  ggtitle('Patient per GP practice per LAD',
-          subtitle = 'in hectare')
-plot5 + scale_fill_viridis() 
+  ggtitle('Population density',
+          subtitle = 'per km2')
+plot1 + scale_fill_viridis() 
+
+# Create Figure 2B-2
+plot2 <- ggplot(data = shp2, aes(x = long, y = lat, group = group, fill = Nb_GPSurgeries)) +
+  geom_polygon() + coord_equal() + theme_void() +
+  ggtitle('Number of GP practice')
+plot2 + scale_fill_viridis() 
+
+# Create Figure 2B-3
+x = data_density_exCoL$Pop_Density
+y = data_density_exCoL$Nb_GPSurgeries
+plot(x, y, pch=19) +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+abline(lm(Nb_GPSurgeries ~ Pop_Density, data = data_density_exCoL), col = "blue")
+model = lm(x ~ y)
+summary(model)
+#R2 = 0.17

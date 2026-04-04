@@ -1,0 +1,20 @@
+# Checking and setting the folder containing the datasets
+getwd()
+setwd("D:/Publication MDM/In progress/GP_2025/Figures and Manuscript/MDPI-Epidemiologia 11032026/Round 1 - Reviews")
+library(readxl)
+library(ggplot2)
+
+#Loading the data
+data_UK = read_excel("Data_FigS1.xlsx", sheet = "Data_UK")
+data_UK$Region = as.factor(data_UK$Region)
+table(data_UK$Region)
+#327 LAD in England, 11 in Northern Ireland, 32 in Scotland and 22 in Wales. Total 392.
+
+graph_S1 = ggplot(data_UK, aes(x=Pop_d, y=Nb_Prac, color=Region)) +  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + 
+  geom_point(size=3)
+graph_S1 + scale_x_log10() + scale_y_log10() + annotation_logticks()
+
+model = lm(data_UK$Pop_d ~ data_UK$Nb_Prac)
+summary(model)
+#r2=0.13, p=8.2e-14
